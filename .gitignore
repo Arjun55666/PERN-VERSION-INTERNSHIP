@@ -1,0 +1,9 @@
+node_modules/
+.env
+dist/
+coverage/
+server/uploads/
+server/generated/
+server/src/database/iocl-data.json
+*.log
+.DS_Store

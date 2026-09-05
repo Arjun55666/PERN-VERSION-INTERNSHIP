@@ -1,0 +1,55 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model HardwareAsset {
+  id             Int               @id @default(autoincrement())
+  assetId        String            @unique @map("asset_id") @db.VarChar(50)
+  assetModel     String            @map("asset_model") @db.VarChar(50)
+  datePurchased  String            @map("date_purchased") @db.VarChar(10)
+  serialNumber   String            @unique @map("serial_number") @db.VarChar(100)
+  area           String            @db.VarChar(50)
+  hardwareType   String            @map("hardware_type") @db.VarChar(50)
+  isSold         Boolean           @default(false) @map("is_sold")
+  isWorking      Boolean           @default(true) @map("is_working")
+  createdAt      DateTime          @default(now()) @map("created_at")
+  assignments    AssetAssignment[]
+
+  @@index([area])
+  @@index([hardwareType])
+  @@map("hardware_assets")
+}
+
+model AssetAssignment {
+  id                  Int            @id @default(autoincrement())
+  assetId             Int            @map("asset_id")
+  department          String         @db.VarChar(100)
+  employeeName        String         @map("employee_name") @db.VarChar(100)
+  assetModel          String         @map("asset_model") @db.VarChar(50)
+  employeeCode        String         @map("employee_code") @db.VarChar(50)
+  assignedDate        String         @map("assigned_date") @db.VarChar(10)
+  isActive            Boolean        @default(true) @map("is_active")
+  deactivatedAt       DateTime?      @map("deactivated_at")
+  qrVerified          Boolean?       @map("qr_verified")
+  qrVerifiedImage     String?        @map("qr_verified_image") @db.VarChar(255)
+  serialVerifiedImage String?        @map("serial_verified_image") @db.VarChar(255)
+  createdAt           DateTime       @default(now()) @map("created_at")
+  asset               HardwareAsset  @relation(fields: [assetId], references: [id], onDelete: Cascade)
+
+  @@index([assetId, isActive])
+  @@index([department])
+  @@map("asset_assignment")
+}
+
+model LocationAssetCount {
+  id           Int    @id @default(autoincrement())
+  locationName String @unique @map("location_name") @db.VarChar(100)
+  totalCount   Int    @default(0) @map("total_count")
+
+  @@map("location_asset_counts")
+}
